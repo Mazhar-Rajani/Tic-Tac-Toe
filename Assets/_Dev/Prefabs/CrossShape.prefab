@@ -265,7 +265,7 @@ GameObject:
   - component: {fileID: 4380693577981115507}
   - component: {fileID: 6175416169785598775}
   m_Layer: 0
-  m_Name: Cross
+  m_Name: CrossShape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,7 +9,7 @@ public class Board : MonoBehaviour
     [SerializeField] private Line linePrefab = default;
     [SerializeField] private Cell cellPrefab = default;
     [SerializeField] private int rowCount = default;
-    [Range(0, 1)] [SerializeField] private float padding = default;
+    [Range(0, 1)][SerializeField] private float padding = default;
 
     private Vector2 size;
     private Vector3 origin;
@@ -69,14 +69,15 @@ public class Board : MonoBehaviour
         }
     }
 
-    public Cell GetCurrCell(Vector3 mousePos)
+    public bool GetCurrCell(Vector3 mousePos, out Cell cell)
     {
+        cell = null;
         RaycastHit2D hitInfo = Physics2D.Raycast(mousePos, Vector2.zero);
-        if (hitInfo.collider != null && hitInfo.collider.TryGetComponent(out Cell cell))
+        if (hitInfo.collider != null && hitInfo.collider.TryGetComponent(out cell))
         {
-            return cell;
+            return true;
         }
-        return null;
+        return false;
     }
 
     public bool IsInBounds(Vector3 mousePos)
@@ -117,7 +118,7 @@ public class Board : MonoBehaviour
         return new Vector2Int(Mathf.FloorToInt(cell.cellIndex % rowCount), Mathf.FloorToInt(cell.cellIndex / rowCount));
     }
 
-    private bool IsMovesLeft()
+    public bool HasEmptyCells()
     {
         for (int i = 0; i < Cells.Count; i++)
         {

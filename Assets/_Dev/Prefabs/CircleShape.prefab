@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4897890170899604595}
   - component: {fileID: 803104104049250403}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: CircleShape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

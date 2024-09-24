@@ -6,52 +6,75 @@ using Shapes;
 
 public class PlayerController : MonoBehaviour
 {
-    public static event Action OnTurnStart;
+    public static event Action OnTurnPlayed;
 
-    [SerializeField] private int playerTurnIndex = default;
+    [SerializeField] private int turnIndex = default;
     [SerializeField] private Board board = default;
     [SerializeField] private Shape crossPrefab = default;
     [SerializeField] private Shape circlePrefab = default;
-    [SerializeField] private TurnManager turnManager = default;
+    [SerializeField] private PreviewShape previewShape = default;
 
     private Cell currCell;
-    private Shape currShape;
+    private int currTurnIndex;
+    private IGameplayInput input;
 
     private void Awake()
     {
-        currShape = Instantiate(turnManager.turnIndex == 0 ? crossPrefab : circlePrefab, transform);
+        input = GetComponent<IGameplayInput>();
+        previewShape.Init(turnIndex);
+
+        TurnManager.OnTurnUpdated += OnTurnUpdated;
+    }
+
+    private void OnDestroy()
+    {
+        TurnManager.OnTurnUpdated -= OnTurnUpdated;
+    }
+
+    private void OnTurnUpdated(int turnIndex)
+    {
+        currTurnIndex = turnIndex;
     }
 
     private void Update()
     {
-        if (playerTurnIndex != turnManager.turnIndex || !board.IsInBounds(GetMousePos()))
+        if (!IsTurnValid() || !GetCurrCell())
             return;
 
-        currCell = board.GetCurrCell(GetMousePos());
-
-        if (Input.GetMouseButtonUp(0))
+        if (ProcessInput())
         {
-            currShape = Instantiate(turnManager.turnIndex == 0 ? crossPrefab : circlePrefab, transform);
-            currShape.transform.position = currCell.cellPos;
-            EvaluateGameState();
-        }
-        else
-        {
-            currShape.transform.position = currCell.cellPos;
+            SpawnShape();
+            OnTurnPlayed?.Invoke();
         }
     }
 
-    private void EvaluateGameState()
+    private bool GetCurrCell()
     {
-        OnTurnStart?.Invoke();
+        if (board.GetCurrCell(Mouse.GetMouseWorldPos(), out Cell currCell))
+        {
+
+        }
     }
 
-    private Vector3 GetMousePos()
+    private bool IsTurnValid()
     {
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        worldPos.z = 0f;
-        return worldPos;
+        return turnIndex == currTurnIndex;
     }
+
+    private bool ProcessInput()
+    {
+        return input.ProcessInput();
+    }
+
+
+
+    private void SpawnShape()
+    {
+        Shape shape = Instantiate(turnIndex == 0 ? crossPrefab : circlePrefab, transform);
+        shape.transform.position = currCell.cellPos;
+    }
+
+
 
     private void OnDrawGizmos()
     {
